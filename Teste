@@ -1,0 +1,150 @@
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+
+pcall(function()
+	StarterGui:SetCore("SendNotification", { 
+		Title = "Duplicate script";
+		Text = "BY CoiledTom";
+		Icon = "rbxthumb://type=Asset&id=5107182114&w=150&h=150";
+		Duration = 5;
+	})
+end)
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "TomDupGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Função arrastar suave
+local function makeDraggable(frame)
+	local dragging = false
+	local dragStart, startPos
+	
+	frame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			dragging = true
+			dragStart = input.Position
+			startPos = frame.Position
+		end
+	end)
+
+	UserInputService.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			dragging = false
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+			local delta = input.Position - dragStart
+			frame.Position = UDim2.new(
+				startPos.X.Scale,
+				startPos.X.Offset + delta.X,
+				startPos.Y.Scale,
+				startPos.Y.Offset + delta.Y
+			)
+		end
+	end)
+end
+
+-- Botão 😈 corrigido
+local Toggle = Instance.new("TextButton")
+Toggle.Size = UDim2.new(0, 40, 0, 40)
+Toggle.Position = UDim2.new(0, 20, 0.5, -20)
+Toggle.Text = "😈"
+Toggle.TextScaled = true
+Toggle.TextWrapped = true
+Toggle.BackgroundColor3 = Color3.fromRGB(20,20,20)
+Toggle.TextColor3 = Color3.new(1,1,1)
+Toggle.Parent = ScreenGui
+Instance.new("UICorner", Toggle).CornerRadius = UDim.new(1,0)
+makeDraggable(Toggle)
+
+-- GUI principal
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 250, 0, 160)
+Main.Position = UDim2.new(0.5, -125, 0.5, -80)
+Main.BackgroundColor3 = Color3.fromRGB(10,10,10)
+Main.Visible = false
+Main.Parent = ScreenGui
+Main.Active = true
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 14)
+makeDraggable(Main)
+
+-- Título
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "Tom duplicar"
+Title.TextScaled = true
+Title.TextColor3 = Color3.new(1,1,1)
+Title.Parent = Main
+
+-- Botão duplicar
+local DupButton = Instance.new("TextButton")
+DupButton.Size = UDim2.new(0.8, 0, 0.3, 0)
+DupButton.Position = UDim2.new(0.1, 0, 0.25, 0)
+DupButton.Text = "duplicar tool"
+DupButton.TextScaled = true
+DupButton.BackgroundColor3 = Color3.fromRGB(0,120,255)
+DupButton.TextColor3 = Color3.new(1,1,1)
+DupButton.Parent = Main
+Instance.new("UICorner", DupButton).CornerRadius = UDim.new(0, 10)
+
+-- Rodapé RGB
+local Footer = Instance.new("TextButton")
+Footer.Size = UDim2.new(1, 0, 0, 25)
+Footer.Position = UDim2.new(0, 0, 1, -25)
+Footer.BackgroundTransparency = 1
+Footer.Text = "by CoiledTom"
+Footer.TextScaled = true
+Footer.TextColor3 = Color3.fromRGB(180,180,180)
+Footer.Parent = Main
+
+Toggle.MouseButton1Click:Connect(function()
+	Main.Visible = not Main.Visible
+end)
+
+-- Sistema duplicação perfeita
+DupButton.MouseButton1Click:Connect(function()
+	local character = player.Character or player.CharacterAdded:Wait()
+	local tool = character:FindFirstChildOfClass("Tool")
+	
+	if tool then
+		local clone = tool:Clone()
+		clone.Name = tool.Name
+		clone.Parent = player.Backpack
+		
+		-- Reinicia todos scripts internos
+		for _, obj in pairs(clone:GetDescendants()) do
+			if obj:IsA("Script") or obj:IsA("LocalScript") then
+				obj.Disabled = true
+				obj.Disabled = false
+			end
+		end
+	end
+end)
+
+-- RGB rodapé
+local clicks = 0
+local active = false
+
+Footer.MouseButton1Click:Connect(function()
+	clicks += 1
+	if clicks >= 5 and not active then
+		clicks = 0
+		active = true
+		local endTime = tick() + 5
+		task.spawn(function()
+			while tick() < endTime do
+				Footer.TextColor3 = Color3.fromHSV((tick()%5)/5,1,1)
+				task.wait(0.05)
+			end
+			Footer.TextColor3 = Color3.fromRGB(180,180,180)
+			active = false
+		end)
+	end
+end)
